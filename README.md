@@ -64,7 +64,7 @@ The project investigates the **Schema Alignment Bottleneck**—the difficulty ze
     Run the construction script (located in `src/wikigraphs`):
     ```bash
     # Example command to build the 'max256' version for all splits
-    python -m src.wikigraphs.scripts.freebase_preprocess \
+    python -m wikigraphs.scripts.freebase_preprocess \
       --wikitext_dir=data/wikitext-103 \
       --freebase_dir=data/freebase/max256 \
       --output_dir=data/wikigraphs/max256
@@ -162,6 +162,89 @@ To rigorously assess the quality of generated graphs, the pipeline employs a **m
 
 ### ⚠️ Note on Metrics
 Due to the incompleteness of the WikiGraphs ground truth (where valid facts in text may not have corresponding hyperlinks), this project prioritizes **Recall** as the primary performance indicator, treating Precision as a secondary metric for noise estimation.
+
+## 🧪 Reproducing Experiments
+
+All experiments are designed to be run from the root directory. Results are saved to CSV files in the root folder and detailed JSON logs in `checkpoints/`.
+
+### 1. Baselines & Upper Bounds
+Establish the theoretical limits and the baseline performance of simple vector retrieval.
+
+*   **Oracle Linking (Upper Bound):**
+    ```bash
+    python llmgrapher_experiment_oracle_linking.py
+    ```
+    *Tests extraction quality when linking is perfect (restricted search space).*
+
+*   **VectorDB-Only (Lower Bound):**
+    ```bash
+    python llmgrapher_experiment_vectordb-only_linking.py
+    ```
+    *Tests standard semantic search without any LLM reranking.*
+
+### 2. Contextual Reranking (Filtered KB) - **Main Results**
+These scripts run the proposed pipeline using the **Cleaned/Filtered Knowledge Base** (removing stopwords/junk entities) to maximize precision.
+
+*   **Linguistic Context (Sentences):**
+    ```bash
+    python llmgrapher_experiment_filtered_vectordb-llm_linking-sentences.py
+    ```
+    *Uses the original source sentence to disambiguate entities.*
+
+*   **Structural Context (Triplets):**
+    ```bash
+    python llmgrapher_experiment_filtered_vectordb-llm_linking-triplets.py
+    ```
+    *Uses neighboring graph nodes/edges to disambiguate entities.*
+
+### 3. Contextual Reranking (Unfiltered KB) - **Ablation Study**
+These scripts run the pipeline against the **Full (Noisy) Freebase** dump. Comparing these results to the Filtered results demonstrates the impact of Knowledge Base cleaning.
+
+*   **Linguistic Context (Unfiltered):**
+    ```bash
+    python llmgrapher_experiment_vectordb-llm_linking-sentences.py
+    ```
+
+*   **Structural Context (Unfiltered):**
+    ```bash
+    python llmgrapher_experiment_vectordb-llm_linking-triplets.py
+    ```
+
+### 4. Additional Experiments
+*   **Pairwise Focus:**
+    ```bash
+    python llmgrapher_experiment_withPairs.py
+    ```
+    *An iteration focused specifically on evaluating connected node pairs in addition to full triplets.*
+
+*   **Debug Modes:**
+    Scripts ending in `-debug.py` (e.g., `llmgrapher_experiment_vectordb-llm_linking-triplets-debug.py`) enable verbose logging to trace the LLM's internal decision-making process during reranking.
+
+---
+
+## 🔍 Analysis & Diagnostics
+
+After running the experiments, use these tools to generate reports and visualize data.
+
+### Qualitative Analysis (PDF Reports)
+*   **Full Sample Analysis:**
+    ```bash
+    python analyze_samples.py
+    ```
+    *Generates annotated PDF reports for full-text samples using a 9-color highlighting scheme to compare Generated vs. Ground Truth.*
+
+*   **Focused Diagnostic (Pruning):**
+    ```bash
+    python analyze_samples_focused.py
+    ```
+    *Runs the "Knowledge-Based Pruning" experiment on truncated text and generates deep-dive diagnostic PDFs in `analysis_reports_focused/`.*
+
+### Quantitative Visualization
+*   **Metrics Visualization:**
+    Open `results-visulizer.ipynb` in Jupyter. This notebook parses the output CSV files and generates the formatted Pandas DataFrames used in the thesis tables.
+
+*   **Prompt Engineering Validation:**
+    Open `test_correference_llm.ipynb` to reproduce the comparison between the Baseline Prompt and the Coreference-Aware Prompt.
 
 ## 📄 Citation
 
