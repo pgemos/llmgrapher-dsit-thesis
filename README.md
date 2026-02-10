@@ -94,8 +94,8 @@ Scripts used to deep-dive into the results, generate visual reports, and perform
 
 | File Name | Description |
 | :--- | :--- |
-| `analyze_samples_focused.py` | **Qualitative Diagnostic Investigation:** The primary tool for the thesis's "Qualitative Error Analysis". It conducts a deep-dive diagnosis on truncated text segments (first N paragraphs) to isolate specific failure modes, producing detailed pdf reports. In addition, it implements **Knowledge-Based Pruning** to filter hallucinations against Freebase. |
-| `analyze_samples.py` | A counterpart to the `analyze_samples_focused.py` that processes the *full* source text to calculate aggregate performance metrics and producing detailed pdf reports. Evaluates raw generation **without** Knowledge-Based Pruning or text truncation. |
+| `analyze_samples_focused.py` | **Qualitative Diagnostic Investigation:** The primary tool for the thesis's "Qualitative Error Analysis". It conducts a deep-dive diagnosis on truncated text segments (first N paragraphs) to isolate specific failure modes, producing detailed pdf reports. In addition, it implements **Knowledge-Based Pruning** to filter hallucinations against Freebase, generating detailed visual comparisons to assess the impact of semantic refinement. |
+| `analyze_samples.py` | A counterpart to the `analyze_samples_focused.py` that processes the *full* source text to calculate aggregate performance metrics and producing detailed pdf reports that assist for conducting qualitative error analysis. Unlike the focused analysis, this script evaluates the raw generation **without Knowledge-Based Pruning** or text truncation. |
 | `results-visulizer.ipynb` | Jupyter notebook for visualizing quantitative results (charts, tables of precision/recall/F1). |
 | `test_correference_llm.ipynb` | Notebook for the validation and testing of intrinsic LLM-prompted coreference resolution. |
 | `exploration.ipynb` | Scratchpad notebook for initial data exploration and code testing. |
@@ -130,12 +130,15 @@ Helper scripts for maintenance and verification.
 
 | File Name | Description |
 | :--- | :--- |
-| `verify_vocabulary_coverage.py` | Performs a crucial validation step for the thesis experiment. Verifies what percentage of ground truth entities/predicates are actually present in the global Freebase KG. |
+| `verify_vocabulary_coverage.py` | This script performs a crucial validation step for the thesis experiment. It verifies what percentage of the ground truth entities and predicates from the WikiGraphs dataset are actually present in the global Freebase knowledge graph used for standardization and linking. |
 | `upgrade_checkpoints.py` | Utility to update the format of existing JSON checkpoint files if the schema changes. |
-| `final_experiment_suite.ipynb` | Notebook used as a preparation ground for running the final suite of experiments. |
+| `final_experiment_suite.ipynb` | Experimental notebook used initially as a preparation ground for running the final suite of experiments which are now done via the `llmgrapher_experiment_*` files. |
 | `versioning/` | Contains archived or deprecated scripts. |
 
 ---
+
+### 📝 Note on "Focused" vs. Standard Scripts
+The `*_focused.py` scripts and directories relate to the qualitative error analysis phase of the thesis. They operate on a subset of data (first two paragraphs) to allow for manual inspection, visual highlighting of errors (hallucinations vs. mapping errors), and testing of the pruning hypothesis.
 
 ## 📊 Evaluation Logic
 
