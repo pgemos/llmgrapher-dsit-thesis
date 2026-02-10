@@ -1,11 +1,58 @@
-# LLMGrapher Project Structure
+# LLMGrapher: Document-Level Knowledge Graph Construction
 
-This repository contains the codebase, data, and experimental results for **LLMGrapher**, a research project investigating the capabilities of Large Language Models (LLMs) to generate Knowledge Graphs from text, specifically targeting the WikiGraphs dataset and aligning with the Freebase ontology.
+**LLMGrapher** is a modular research pipeline designed to evaluate the capabilities of Large Language Models (LLMs) in constructing Knowledge Graphs (KGC) from unstructured text.
 
-## 📂 Directory Overview
+This repository contains the source code, data handling scripts, and experimental results for the Master's Thesis: **"LLMGrapher: Transforming Texts to Knowledge Graphs with the Power of Large Language Models"**.
+
+## 📖 Overview
+
+The project investigates the **Schema Alignment Bottleneck**—the difficulty zero-shot LLMs face in mapping extracted facts to rigid Knowledge Base identifiers (e.g., Freebase). It proposes a hybrid pipeline separating **Generation** (via Llama 3.1) from **Normalization** (via VectorDBs and Contextual Reranking).
+
+### Key Features
+*   **Zero-Shot Extraction:** Utilizing prompt engineering to extract entities and relations without fine-tuning.
+*   **Modular Linking:** Pluggable modules for Candidate Retrieval (ChromaDB) and Contextual Reranking.
+*   **Recall-Centric Evaluation:** A multi-layered metric suite (Strict vs. Resilient vs. Semantic).
+*   **Diagnostic Tools:** Automated PDF reporting for qualitative error analysis and Knowledge-Based Pruning.
+
+---
+
+## 🚀 Setup & Installation
+
+### Prerequisites
+*   **Python 3.9+**
+*   **Ollama:** Ensure [Ollama](https://ollama.com/) is installed and running.
+*   **Model:** Pull the Llama 3.1 model: `ollama pull llama3.1:8b`
+
+### Installation
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/pgemos/llmgrapher-dsit-thesis.git
+    cd llmgrapher-dsit-thesis
+    ```
+
+2.  **Install Python dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3.  **Download SpaCy model:**
+    ```bash
+    python -m spacy download en_core_web_lg
+    ```
+    
+4. **Download Datasets:**
+    Run the included script to automatically fetch WikiGraphs and Freebase data:
+    ```bash
+    chmod +x ./wikigraphs/scripts/download.sh
+    ./wikigraphs/scripts/download.sh
+    ```
+
+---
+
+## 📂 Repository Contents & File Description
 
 ### 🧪 Experiment Scripts (Core Pipeline)
-These scripts contain the main pipelines for generating graphs from text, standardizing entities/predicates, and evaluating against ground truth. They vary by linking strategy and context usage.
+These scripts contain the main pipelines for generating graphs from text, standardizing entities/predicates, and evaluating against ground truth.
 
 | File Name | Description |
 | :--- | :--- |
@@ -23,8 +70,8 @@ Scripts used to deep-dive into the results, generate visual reports, and perform
 
 | File Name | Description |
 | :--- | :--- |
-| `analyze_samples_focused.py` | **Qualitative Diagnostic Investigation:** The primary tool for the thesis's "Qualitative Error Analysis". It conducts a deep-dive diagnosis on truncated text segments (first N paragraphs) to isolate specific failure modes, producing detailed pdf reports. In addition, it implements **Knowledge-Based Pruning** to filter hallucinations against Freebase, generating detailed visual comparisons to assess the impact of semantic refinement. |
-| `analyze_samples.py` | A counterpart to the `analyze_samples_focused.py` that processes the *full* source text to calculate aggregate performance metrics and producing detailed pdf reports that assist for conducting qualitative error analysis. Unlike the focused analysis, this script evaluates the raw generation **without Knowledge-Based Pruning** or text truncation. |
+| `analyze_samples_focused.py` | **Qualitative Diagnostic Investigation:** The primary tool for the thesis's "Qualitative Error Analysis". It conducts a deep-dive diagnosis on truncated text segments (first N paragraphs) to isolate specific failure modes, producing detailed pdf reports. In addition, it implements **Knowledge-Based Pruning** to filter hallucinations against Freebase. |
+| `analyze_samples.py` | A counterpart to the `analyze_samples_focused.py` that processes the *full* source text to calculate aggregate performance metrics and producing detailed pdf reports. Evaluates raw generation **without** Knowledge-Based Pruning or text truncation. |
 | `results-visulizer.ipynb` | Jupyter notebook for visualizing quantitative results (charts, tables of precision/recall/F1). |
 | `test_correference_llm.ipynb` | Notebook for the validation and testing of intrinsic LLM-prompted coreference resolution. |
 | `exploration.ipynb` | Scratchpad notebook for initial data exploration and code testing. |
@@ -59,12 +106,49 @@ Helper scripts for maintenance and verification.
 
 | File Name | Description |
 | :--- | :--- |
-| `verify_vocabulary_coverage.py` | This script performs a crucial validation step for the thesis experiment. It verifies what percentage of the ground truth entities and predicates from the WikiGraphs dataset are actually present in the global Freebase knowledge graph used for standardization and linking. |
+| `verify_vocabulary_coverage.py` | Performs a crucial validation step for the thesis experiment. Verifies what percentage of ground truth entities/predicates are actually present in the global Freebase KG. |
 | `upgrade_checkpoints.py` | Utility to update the format of existing JSON checkpoint files if the schema changes. |
-| `final_experiment_suite.ipynb` | Experimental notebook used initially as a preparation ground for running the final suite of experiments which are now done via the `llmgrapher_experiment_*` files. |
+| `final_experiment_suite.ipynb` | Notebook used as a preparation ground for running the final suite of experiments. |
 | `versioning/` | Contains archived or deprecated scripts. |
 
 ---
 
-### 📝 Note on "Focused" vs. Standard Scripts
-The `*_focused.py` scripts and directories relate to the qualitative error analysis phase of the thesis. They operate on a subset of data (first two paragraphs) to allow for manual inspection, visual highlighting of errors (hallucinations vs. mapping errors), and testing of the pruning hypothesis.
+## 📊 Evaluation Logic
+
+To rigorously assess the quality of generated graphs, the pipeline employs a **multi-layered evaluation strategy** moving from rigid syntactic matching to flexible semantic assessment.
+
+### 1. Strict Matching (Syntactic)
+*   **Definition:** Requires an exact, case-insensitive string match for the triplet `(Subject, Predicate, Object)`.
+*   **Purpose:** Measures the model's ability to perfectly adhere to the specific Freebase schema vocabulary and directionality.
+*   **Limitation:** Often penalizes valid synonyms (e.g., *“wrote”* vs *“author of”*).
+
+### 2. Resilient Matching (Structural)
+*   **Definition:** Checks if the pair of entities `{Subject, Object}` exists in the ground truth, regardless of the edge label or direction.
+*   **Purpose:** Isolates **Entity Linking** performance from **Relation Extraction**. It determines if the model correctly identified that *a* relationship exists, even if it got the specific predicate wrong.
+
+### 3. Semantic Matching (LLM-as-a-Judge)
+*   **Definition:** If the entities match but the predicate differs, a second LLM acts as a judge to compare the semantic meaning of the generated predicate against the ground truth predicate.
+*   **Categories:**
+    *   **High Confidence:** The predicates are semantically identical (e.g., *“married to”* $\approx$ *“spouse”*).
+    *   **Plausible:** The predicate is reasonable but less specific.
+*   **Purpose:** Addresses the **Schema Alignment Bottleneck** by distinguishing between hallucinated relations and valid relations expressed in natural language.
+
+### ⚠️ Note on Metrics
+Due to the incompleteness of the WikiGraphs ground truth (where valid facts in text may not have corresponding hyperlinks), this project prioritizes **Recall** as the primary performance indicator, treating Precision as a secondary metric for noise estimation.
+
+## 📄 Citation
+
+If you use this code or thesis in your research, please cite:
+
+```bibtex
+@mastersthesis{gemos202Xllmgrapher,
+  author  = {Panagiotis-Konstantinos Gemos},
+  title   = {LLMGrapher: Transforming Texts to Knowledge Graphs with the Power of Large Language Models},
+  school  = {National and Kapodistrian University of Athens},
+  year    = {202X},
+  month   = {X}
+}
+```
+
+## 📜 License
+This project is licensed under the MIT License - see the `LICENSE` file for details.
