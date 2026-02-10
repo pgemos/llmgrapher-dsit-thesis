@@ -22,6 +22,7 @@ The project investigates the **Schema Alignment Bottleneck**—the difficulty ze
 *   **Python 3.9+**
 *   **Ollama:** Ensure [Ollama](https://ollama.com/) is installed and running.
 *   **Model:** Pull the Llama 3.1 model: `ollama pull llama3.1:8b`
+*   **System Tools:** `wget`, `tar`, `unzip`, `git` (standard on Linux/Mac).
 
 ### Installation
 1.  **Clone the repository:**
@@ -30,22 +31,45 @@ The project investigates the **Schema Alignment Bottleneck**—the difficulty ze
     cd llmgrapher-dsit-thesis
     ```
 
-2.  **Install Python dependencies:**
+2.  **Setup the WikiGraphs Library:**
+    This project relies on the DeepMind `wikigraphs` data loaders. If not already present in the root, setup the module:
+    ```bash
+    # Clone and arrange the DeepMind library (Linux/Mac)
+    git clone https://github.com/google-deepmind/deepmind-research.git temp_dm
+    mv temp_dm/wikigraphs/wikigraphs .
+    mv temp_dm/wikigraphs/scripts wikigraphs/
+    rm -rf temp_dm
+    ```
+
+3.  **Install Python dependencies:**
     ```bash
     pip install -r requirements.txt
     ```
 
-3.  **Download SpaCy model:**
+4.  **Download SpaCy model:**
     ```bash
     python -m spacy download en_core_web_lg
     ```
     
-4. **Download Datasets:**
+5. **Download Datasets:**
     Run the included script to automatically fetch WikiGraphs and Freebase data:
     ```bash
     chmod +x ./wikigraphs/scripts/download.sh
     ./wikigraphs/scripts/download.sh
     ```
+
+6.  **Build the WikiGraphs Dataset:**
+    The WikiGraphs dataset must be constructed locally by pairing the downloaded text with the knowledge graphs. This project uses the tools provided by the [DeepMind WikiGraphs repository](https://github.com/google-deepmind/deepmind-research/tree/master/wikigraphs).
+
+    Run the construction script (located in `src/wikigraphs`):
+    ```bash
+    # Example command to build the 'max256' version for all splits
+    python -m src.wikigraphs.scripts.freebase_preprocess \
+      --wikitext_dir=data/wikitext-103 \
+      --freebase_dir=data/freebase/max256 \
+      --output_dir=data/wikigraphs/max256
+    ```
+    *This process aligns the unstructured text with the structured subgraphs to create the Ground Truth.*
 
 ---
 
