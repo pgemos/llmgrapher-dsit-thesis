@@ -1,0 +1,10 @@
+pandas
+tqdm
+spacy
+ollama
+chromadb
+langchain
+reportlab
+networkx
+jupyter
+matplotlib
