@@ -64,7 +64,7 @@ The project investigates the **Schema Alignment Bottleneck**—the difficulty ze
     Run the construction script (located in `src/wikigraphs`):
     ```bash
     # Example command to build the 'max256' version for all splits
-    python -m wikigraphs.scripts.freebase_preprocess \
+    python wikigraphs/scripts/freebase_preprocess.py \
       --wikitext_dir=data/wikitext-103 \
       --freebase_dir=data/freebase/max256 \
       --output_dir=data/wikigraphs/max256
@@ -101,7 +101,7 @@ Scripts used to deep-dive into the results, generate visual reports, and perform
 | `exploration.ipynb` | Scratchpad notebook for initial data exploration and code testing. |
 
 ### 📦 Data & Caching
-Files used to store the Knowledge Base, cached dataframes to speed up loading, and embeddings.
+Files used to store the Knowledge Base, cached dataframes to speed up loading, and embeddings. (*created during and after execution of project code files*)
 
 | File/Folder | Description |
 | :--- | :--- |
@@ -115,7 +115,7 @@ Files used to store the Knowledge Base, cached dataframes to speed up loading, a
 | `description_embeddings/` | ChromaDB folder containing vector embeddings for Freebase entity descriptions. |
 
 ### 💾 Checkpoints & Outputs
-Directories where the system saves progress and final reports.
+Directories where the system saves progress and final reports. (*created during and after execution of project code files*)
 
 | Folder | Description |
 | :--- | :--- |
@@ -133,7 +133,6 @@ Helper scripts for maintenance and verification.
 | `verify_vocabulary_coverage.py` | This script performs a crucial validation step for the thesis experiment. It verifies what percentage of the ground truth entities and predicates from the WikiGraphs dataset are actually present in the global Freebase knowledge graph used for standardization and linking. |
 | `upgrade_checkpoints.py` | Utility to update the format of existing JSON checkpoint files if the schema changes. |
 | `final_experiment_suite.ipynb` | Experimental notebook used initially as a preparation ground for running the final suite of experiments which are now done via the `llmgrapher_experiment_*` files. |
-| `versioning/` | Contains archived or deprecated scripts. |
 
 ---
 
