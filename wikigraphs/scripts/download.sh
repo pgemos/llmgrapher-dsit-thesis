@@ -48,7 +48,7 @@ rm -rf ${TARGET_DIR}/wikitext-103-raw ${TARGET_DIR}/wikitext-103-raw-v1.zip
 
 
 # processed freebase graphs
-FREEBASE_TARGET_DIR=/tmp/data
+FREEBASE_TARGET_DIR=./data
 mkdir -p ${FREEBASE_TARGET_DIR}/packaged/
 wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1uuSS2o72dUCJrcLff6NBiLJuTgSU-uRo' -O ${FREEBASE_TARGET_DIR}/packaged/max256.tar
 wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1nOfUq3RUoPEWNZa2QHXl2q-1gA5F6kYh' -O ${FREEBASE_TARGET_DIR}/packaged/max512.tar
