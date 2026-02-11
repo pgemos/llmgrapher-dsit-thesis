@@ -28,7 +28,7 @@
 #     https://creativecommons.org/licenses/by/4.0/legalcode
 #
 # ==============================================================================
-BASE_DIR=/tmp/data
+BASE_DIR=./data
 
 # wikitext-103
 TARGET_DIR=${BASE_DIR}/wikitext-103
