@@ -3,7 +3,7 @@
 #
 # MODIFICATION NOTICE:
 # This file was modified by Panagiotis-Konstantinos Gemos.
-# Changes: - Updated dataset download URIs to use stable wikitext.smerity.com .
+# Changes: - Updated WikiText-103 datasets download URIs to use wikitext.smerity.com (previous links were broken).
 #          - Reorganized URLs into configuration variables.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
