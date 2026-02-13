@@ -86,4 +86,4 @@ do
 done
 rm -rf ${FREEBASE_TARGET_DIR}/packaged
 
-echo "Success: Data processing complete."
+echo "Success: Datasets have been downloaded and extracted."
