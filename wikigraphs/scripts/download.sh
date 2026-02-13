@@ -1,6 +1,11 @@
 #!/bin/bash
 # Copyright 2021 DeepMind Technologies Limited. All Rights Reserved.
 #
+# MODIFICATION NOTICE:
+# This file was modified by Panagiotis-Konstantinos Gemos.
+# Changes: - Updated dataset download URIs to use stable wikitext.smerity.com .
+#          - Reorganized URLs into configuration variables.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -28,36 +33,57 @@
 #     https://creativecommons.org/licenses/by/4.0/legalcode
 #
 # ==============================================================================
+
+# ==============================================================================
+# --- USER CONFIGURATION: Panagiotis-Konstantinos Gemos ---
+# ==============================================================================
+# Stable wikitext-103 links
+WIKITEXT_103_URL="https://wikitext.smerity.com/wikitext-103-v1.zip"
+WIKITEXT_103_RAW_URL="https://wikitext.smerity.com/wikitext-103-raw-v1.zip"
+
+# Freebase Processed Data links
+FREEBASE_MAX256_URL="https://docs.google.com/uc?export=download&id=1uuSS2o72dUCJrcLff6NBiLJuTgSU-uRo"
+FREEBASE_MAX512_URL="https://docs.google.com/uc?export=download&id=1nOfUq3RUoPEWNZa2QHXl2q-1gA5F6kYh"
+FREEBASE_MAX1024_URL="https://docs.google.com/uc?export=download&id=1uuJwkocJXG1UcQ-RCH3JU96VsDvi7UD2"
+# ==============================================================================
+
 BASE_DIR=./data
 
-# wikitext-103
+# --- wikitext-103 ---
 TARGET_DIR=${BASE_DIR}/wikitext-103
 mkdir -p ${TARGET_DIR}
-wget https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip -P ${TARGET_DIR}
-unzip ${TARGET_DIR}/wikitext-103-v1.zip -d ${TARGET_DIR}
+echo "Downloading WikiText-103..."
+wget "${WIKITEXT_103_URL}" -P ${TARGET_DIR}
+unzip -q ${TARGET_DIR}/wikitext-103-v1.zip -d ${TARGET_DIR}
 mv ${TARGET_DIR}/wikitext-103/* ${TARGET_DIR}
 rm -rf ${TARGET_DIR}/wikitext-103 ${TARGET_DIR}/wikitext-103-v1.zip
 
-# wikitext-103-raw
+# --- wikitext-103-raw ---
 TARGET_DIR=${BASE_DIR}/wikitext-103-raw
 mkdir -p ${TARGET_DIR}
-wget https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-raw-v1.zip -P ${TARGET_DIR}
-unzip ${TARGET_DIR}/wikitext-103-raw-v1.zip -d ${TARGET_DIR}
+echo "Downloading WikiText-103-Raw..."
+wget "${WIKITEXT_103_RAW_URL}" -P ${TARGET_DIR}
+unzip -q ${TARGET_DIR}/wikitext-103-raw-v1.zip -d ${TARGET_DIR}
 mv ${TARGET_DIR}/wikitext-103-raw/* ${TARGET_DIR}
 rm -rf ${TARGET_DIR}/wikitext-103-raw ${TARGET_DIR}/wikitext-103-raw-v1.zip
 
-
-# processed freebase graphs
+# --- processed freebase graphs ---
 FREEBASE_TARGET_DIR=./data
 mkdir -p ${FREEBASE_TARGET_DIR}/packaged/
-wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1uuSS2o72dUCJrcLff6NBiLJuTgSU-uRo' -O ${FREEBASE_TARGET_DIR}/packaged/max256.tar
-wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1nOfUq3RUoPEWNZa2QHXl2q-1gA5F6kYh' -O ${FREEBASE_TARGET_DIR}/packaged/max512.tar
-wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1uuJwkocJXG1UcQ-RCH3JU96VsDvi7UD2' -O ${FREEBASE_TARGET_DIR}/packaged/max1024.tar
+echo "Downloading Freebase Graphs..."
+
+# Using --no-check-certificate to handle Google Drive redirects
+wget --no-check-certificate "${FREEBASE_MAX256_URL}" -O ${FREEBASE_TARGET_DIR}/packaged/max256.tar
+wget --no-check-certificate "${FREEBASE_MAX512_URL}" -O ${FREEBASE_TARGET_DIR}/packaged/max512.tar
+wget --no-check-certificate "${FREEBASE_MAX1024_URL}" -O ${FREEBASE_TARGET_DIR}/packaged/max1024.tar
 
 for version in max1024 max512 max256
 do
   output_dir=${FREEBASE_TARGET_DIR}/freebase/${version}/
   mkdir -p ${output_dir}
-  tar -xvf ${FREEBASE_TARGET_DIR}/packaged/${version}.tar -C ${output_dir}
+  echo "Extracting ${version}..."
+  tar -xf ${FREEBASE_TARGET_DIR}/packaged/${version}.tar -C ${output_dir}
 done
 rm -rf ${FREEBASE_TARGET_DIR}/packaged
+
+echo "Success: Data processing complete."
