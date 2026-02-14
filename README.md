@@ -148,6 +148,9 @@ Helper scripts for maintenance and verification.
 
 ---
 
+### 📝 Note on "Focused" vs. Standard Scripts
+The `*_focused.py` scripts and directories relate to the qualitative error analysis phase of the thesis. They operate on a subset of data (first two paragraphs) to allow for manual inspection, visual highlighting of errors (hallucinations vs. mapping errors), and testing of the pruning hypothesis.
+
 ## 📊 Evaluation Logic
 
 To rigorously assess the quality of generated graphs, the pipeline employs a **multi-layered evaluation strategy** moving from rigid syntactic matching to flexible semantic assessment.
@@ -169,6 +172,9 @@ To rigorously assess the quality of generated graphs, the pipeline employs a **m
 *   **Purpose:** Addresses the **Schema Alignment Bottleneck** by distinguishing between hallucinated relations and valid relations expressed in natural language.
 
 ---
+
+### ⚠️ Note on Metrics
+Due to the incompleteness of the WikiGraphs ground truth (where valid facts in text may not have corresponding hyperlinks), this project prioritizes **Recall** as the primary performance indicator, treating Precision as a secondary metric for noise estimation.
 
 ## 🧪 Reproducing Experiments
 
@@ -204,24 +210,66 @@ These scripts run the proposed pipeline using the **Cleaned/Filtered Knowledge B
     ```
     *Uses neighboring graph nodes/edges to disambiguate entities.*
 
-### 3. Ablation Studies (Unfiltered)
-To demonstrate the impact of KB filtering, you can run the standard (unfiltered) versions:
-*   `llmgrapher_experiment_vectordb-llm_linking-sentences.py`
-*   `llmgrapher_experiment_vectordb-llm_linking-triplets.py`
+### 3. Contextual Reranking (Unfiltered KB) - **Ablation Study**
+These scripts run the pipeline against the **Full (Noisy) Freebase** dump. Comparing these results to the Filtered results demonstrates the impact of Knowledge Base cleaning.
+
+*   **Linguistic Context (Unfiltered):**
+    ```bash
+    python llmgrapher_experiment_vectordb-llm_linking-sentences.py
+    ```
+
+*   **Structural Context (Unfiltered):**
+    ```bash
+    python llmgrapher_experiment_vectordb-llm_linking-triplets.py
+    ```
+
+### 4. Additional Experiments
+*   **Pairwise Focus:**
+    ```bash
+    python llmgrapher_experiment_withPairs.py
+    ```
+    *An iteration focused specifically on evaluating connected node pairs in addition to full triplets.*
+
+*   **Debug Modes:**
+    Scripts ending in `-debug.py` (e.g., `llmgrapher_experiment_vectordb-llm_linking-triplets-debug.py`) enable verbose logging to trace the LLM's internal decision-making process during reranking.
 
 ---
+
+## 🔍 Analysis & Diagnostics
+
+After running the experiments, use these tools to generate reports and visualize data.
+
+### Qualitative Analysis (PDF Reports)
+*   **Full Sample Analysis:**
+    ```bash
+    python analyze_samples.py
+    ```
+    *Generates annotated PDF reports for full-text samples using a 9-color highlighting scheme to compare Generated vs. Ground Truth.*
+
+*   **Focused Diagnostic (Pruning):**
+    ```bash
+    python analyze_samples_focused.py
+    ```
+    *Runs the "Knowledge-Based Pruning" experiment on truncated text and generates deep-dive diagnostic PDFs in `analysis_reports_focused/`.*
+
+### Quantitative Visualization
+*   **Metrics Visualization:**
+    Open `results-visulizer.ipynb` in Jupyter. This notebook parses the output CSV files and generates the formatted Pandas DataFrames used in the thesis tables.
+
+*   **Prompt Engineering Validation:**
+    Open `test_correference_llm.ipynb` to reproduce the comparison between the Baseline Prompt and the Coreference-Aware Prompt.
 
 ## 📄 Citation
 
 If you use this code or thesis in your research, please cite:
 
 ```bibtex
-@mastersthesis{gemos2025llmgrapher,
+@mastersthesis{gemos202Xllmgrapher,
   author  = {Panagiotis-Konstantinos Gemos},
   title   = {LLMGrapher: Transforming Texts to Knowledge Graphs with the Power of Large Language Models},
   school  = {National and Kapodistrian University of Athens},
-  year    = {2025},
-  month   = {October}
+  year    = {202X},
+  month   = {X}
 }
 ```
 
