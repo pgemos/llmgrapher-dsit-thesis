@@ -85,7 +85,7 @@ The first time you run *any* experiment script (see below), the system will auto
 ### 📝 Thesis Manuscript
 | Folder | Description |
 | :--- | :--- |
-| `pgemos_dsit_thesis/` | **Thesis Manuscript:** Contains the full LaTeX source code, chapters, and figures for the thesis document. |
+| `manuscript/` | **Thesis Manuscript:** Contains the full LaTeX source code, chapters, and figures for the thesis document. |
 
 ### 🧪 Experiment Scripts (Core Pipeline)
 These scripts contain the main pipelines for generating graphs from text, standardizing entities/predicates, and evaluating against ground truth.
