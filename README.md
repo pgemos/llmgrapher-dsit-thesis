@@ -108,7 +108,7 @@ Scripts used to deep-dive into the results, generate visual reports, and perform
 | :--- | :--- |
 | `analyze_samples_focused.py` | **Qualitative Diagnostic Investigation:** The primary tool for the thesis's "Qualitative Error Analysis". It conducts a deep-dive diagnosis on truncated text segments (first N paragraphs) to isolate specific failure modes, producing detailed pdf reports. In addition, it implements **Knowledge-Based Pruning** to filter hallucinations against Freebase, generating detailed visual comparisons to assess the impact of semantic refinement. |
 | `analyze_samples.py` | A counterpart to the `analyze_samples_focused.py` that processes the *full* source text to calculate aggregate performance metrics and producing detailed pdf reports that assist for conducting qualitative error analysis. Unlike the focused analysis, this script evaluates the raw generation **without Knowledge-Based Pruning** or text truncation. |
-| `results-visulizer.ipynb` | Jupyter notebook for visualizing quantitative results (charts, tables of precision/recall/F1). |
+| `results-visualizer.ipynb` | Jupyter notebook for visualizing quantitative results (charts, tables of precision/recall/F1). |
 | `test_correference_llm.ipynb` | Notebook for the validation and testing of intrinsic LLM-prompted coreference resolution. |
 | `exploration.ipynb` | Scratchpad notebook for initial data exploration and code testing. |
 
@@ -254,7 +254,7 @@ After running the experiments, use these tools to generate reports and visualize
 
 ### Quantitative Visualization
 *   **Metrics Visualization:**
-    Open `results-visulizer.ipynb` in Jupyter. This notebook parses the output CSV files and generates the formatted Pandas DataFrames used in the thesis tables.
+    Open `results-visualizer.ipynb` in Jupyter. This notebook parses the output CSV files and generates the formatted Pandas DataFrames used in the thesis tables.
 
 *   **Prompt Engineering Validation:**
     Open `test_correference_llm.ipynb` to reproduce the comparison between the Baseline Prompt and the Coreference-Aware Prompt.
